@@ -2,9 +2,9 @@
 
 # obsidian-community-plugins-mcp
 
-**Ask your AI which Obsidian plugin to use. Get a real answer.**
+**Check before you build. Search all 8,900+ Obsidian plugins from your coding agent.**
 
-Your assistant searches all 8,900+ community plugins and 870+ themes, live, with download counts and versions.
+Building an Obsidian plugin or tool? Find out what already exists, who maintains it, and where the gaps are, before you write a line of code.
 
 [![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-000000?style=for-the-badge)](https://cursor.com/en/install-mcp?name=obsidian-plugins&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImdpdGh1YjpwaXRmYTE5L29ic2lkaWFuLWNvbW11bml0eS1wbHVnaW5zLW1jcCJdfQ==)
 [![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-007ACC?style=for-the-badge)](https://vscode.dev/redirect/mcp/install?name=obsidian-plugins&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Apitfa19%2Fobsidian-community-plugins-mcp%22%5D%7D)
@@ -15,7 +15,7 @@ Your assistant searches all 8,900+ community plugins and 870+ themes, live, with
 [![MCP](https://img.shields.io/badge/MCP-stdio-7c3aed?style=flat-square)](https://modelcontextprotocol.io)
 [![Read-only](https://img.shields.io/badge/access-read--only-success?style=flat-square)](#safety)
 
-[What it is](#what-it-is) · [Install](#install) · [Example](#example) · [Tools](#tools) · [Safety](#safety)
+[What it is](#what-it-is) · [Install](#install) · [Example](#example) · [For agents](#for-coding-agents) · [Tools](#tools) · [Safety](#safety)
 
 </div>
 
@@ -23,16 +23,16 @@ Your assistant searches all 8,900+ community plugins and 870+ themes, live, with
 
 ## What it is
 
-Ask Claude or ChatGPT "what's the best Obsidian plugin for X?" and it answers from memory. It names plugins that do not exist, recommends ones abandoned years ago, and has never heard of anything new.
+The Obsidian community has 8,900+ plugins, and many ideas are already taken. There are 27 plugins that mention pomodoro alone. Coding agents do not know this. Ask one to build a plugin and it starts writing, without checking whether a better one already exists. Ask it what is out there and it answers from memory: plugins that do not exist, plugins abandoned years ago, nothing recent.
 
-**This MCP server gives your assistant the real directory.** It reads the same list that Obsidian's own plugin browser uses, so answers are current.
+**This MCP server gives your agent the real directory.** It reads the same list that Obsidian's own plugin browser uses, so the agent can check what exists before it builds.
 
 - **Every plugin and theme.** 8,900+ plugins and 870+ themes from the official [`obsidianmd/obsidian-releases`](https://github.com/obsidianmd/obsidian-releases) index.
-- **Signals, not just names.** Each result has downloads, latest version and last-update date, so your assistant can tell a popular, maintained plugin from a dead one.
+- **See what is alive.** Each result has downloads, latest version and last-update date. A popular plugin last updated in 2021 is a gap you could fill. A maintained one with a million downloads is a reason to contribute instead.
 - **Nothing to set up.** No API key, no account, no local database. One file, two dependencies.
 - **Only reads.** It never touches your vault or installs anything.
 
-It is for anyone who uses Obsidian with Claude Desktop, Claude Code, Cursor or any other MCP client.
+It is for anyone building Obsidian plugins, themes or tools, and for the coding agents that help them: Claude Code, Cursor, Codex and any other MCP client. It works just as well when you only want to pick the right plugin to install.
 
 ## Install
 
@@ -59,34 +59,52 @@ claude mcp add obsidian-plugins -- npx -y github:pitfa19/obsidian-community-plug
 }
 ```
 
-Restart the client. Ask *"find me an Obsidian plugin for spaced repetition"* to check it works.
+Restart the client. Ask *"is there already an Obsidian plugin for pomodoro timers?"* to check it works.
 
 **To remove it**, delete that config entry, or run `claude mcp remove obsidian-plugins`. Nothing else is left on your machine except the npx cache.
 
 ## Example
 
-> **You:** I want flashcards in Obsidian. What should I install?
+> **You:** Build me an Obsidian plugin with a pomodoro timer.
 
-The assistant calls `search_plugins` with `"spaced repetition"` and gets live data:
+Before writing code, the agent calls `search_plugins` with `"pomodoro"`. It finds 27 matches. The top ones:
 
 | Plugin | Downloads | Latest | Updated |
 | --- | ---: | --- | --- |
-| Spaced Repetition | 614,850 | 1.15.4 | 2026-06-14 |
-| LearnKit | 26,531 | 1.8.2 | 2026-09-14 |
-| Aosr | 16,251 | 1.2.2 | 2026-10-05 |
+| TaskNotes (tasks with built-in pomodoro) | 2,113,918 | 4.13.8 | 2026-10-02 |
+| Status Bar Pomodoro Timer | 67,167 | 0.1.15 | 2025-01-21 |
+| Pomodoro Timer | 60,566 | 1.2.3 | 2024-05-30 |
+| Pomodoro Plugin | 16,983 | 0.0.2 | 2021-05-20 |
 
-So it can answer: *Spaced Repetition is the established choice. LearnKit is newer and actively updated if you want tests as well as flashcards.* Every name is real.
+So instead of building the 28th timer, it can tell you: *a plain timer is well covered, and TaskNotes already ties pomodoros to tasks. Three of the four best-known timers have not shipped an update since early 2025, so a maintained, focused timer is a real opening. Or contribute to one that exists.* Every name and number is real.
+
+It works the same way when you only want to pick a plugin to install. Ask *"what should I use for flashcards?"* and you get Spaced Repetition (614,850 downloads) and newer alternatives, not guesses.
+
+## For coding agents
+
+Add this to your project's `AGENTS.md` or `CLAUDE.md` so your agent checks the directory on its own:
+
+```markdown
+## Obsidian plugin work
+
+Before building any Obsidian plugin, theme or feature, search the community
+directory with the obsidian-plugins MCP tools (`search_plugins`,
+`search_themes`, `get_plugin`). Report what already exists, with downloads
+and last-update dates, and say whether to build, fork, or contribute instead.
+```
+
+The tool descriptions are written so agents can decide on their own when to call them.
 
 ## Tools
 
 | You want | Tool |
 | --- | --- |
-| Find plugins for a task | `search_plugins`: keyword search, most downloaded first |
-| Find a theme | `search_themes`: filter by dark or light mode, with screenshot links |
-| Check one plugin before installing | `get_plugin`: downloads, latest version, last update, release count |
-| See what is popular | `top_plugins`: most downloaded, optionally filtered by keyword |
+| Check if your idea already exists | `search_plugins`: keyword search, most downloaded first |
+| Find a theme, or check a theme idea | `search_themes`: filter by dark or light mode, with screenshot links |
+| Judge one plugin: alive or abandoned? | `get_plugin`: downloads, latest version, last update, release count |
+| See what is popular in a category | `top_plugins`: most downloaded, optionally filtered by keyword |
 
-Every result links to the plugin's GitHub repo, so your assistant can read its README when you want details.
+Every result links to the plugin's GitHub repo, so your agent can read its README and source when it needs details.
 
 ## Safety
 

@@ -86,14 +86,14 @@ function toTerms(query) {
   return query.toLowerCase().split(/\s+/).filter(Boolean);
 }
 
-const server = new McpServer({ name: "obsidian-community-plugins", version: "1.1.0" });
+const server = new McpServer({ name: "obsidian-community-plugins", version: "1.2.0" });
 
 server.registerTool(
   "search_plugins",
   {
     title: "Search Obsidian community plugins",
     description:
-      "Search the official Obsidian community plugin directory (~9000 plugins) by keyword over name, id, author, and description. Returns matches with download counts, sorted by downloads.",
+      "Search the official Obsidian community plugin directory (~9000 plugins) by keyword over name, id, author, and description. Use this BEFORE building or proposing any Obsidian plugin or feature, to check whether it already exists, and whenever someone asks which plugin to use. Returns the total number of matches plus the top results with downloads, latest version and last-update date (an old date means possibly abandoned), sorted by downloads.",
     inputSchema: {
       query: z.string().describe("Keywords, all must match (case-insensitive)"),
       limit: z.number().int().min(1).max(100).default(20).describe("Max results"),
@@ -102,8 +102,8 @@ server.registerTool(
   async ({ query, limit }) => {
     const [plugins, stats] = await Promise.all([fetchJson("plugins"), fetchJson("stats")]);
     const terms = toTerms(query);
-    const out = plugins
-      .filter((p) => matches(`${p.name} ${p.id} ${p.author} ${p.description}`, terms))
+    const matched = plugins.filter((p) => matches(`${p.name} ${p.id} ${p.author} ${p.description}`, terms));
+    const out = matched
       .map((p) => ({
         id: p.id,
         name: p.name,
@@ -117,7 +117,12 @@ server.registerTool(
       .sort((a, b) => b.downloads - a.downloads)
       .slice(0, limit);
     return {
-      content: [{ type: "text", text: JSON.stringify({ total_matches_shown: out.length, results: out }, null, 2) }],
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({ total_matches: matched.length, shown: out.length, results: out }, null, 2),
+        },
+      ],
     };
   }
 );
@@ -127,7 +132,7 @@ server.registerTool(
   {
     title: "Search Obsidian community themes",
     description:
-      "Search the official Obsidian community theme directory (~900 themes) by keyword over name and author. Returns repo links, supported modes (dark/light), and screenshot URLs.",
+      "Search the official Obsidian community theme directory (~900 themes) by keyword over name and author. Use this before designing a new theme, or to recommend one. Returns the total number of matches plus repo links, supported modes (dark/light), and screenshot URLs.",
     inputSchema: {
       query: z.string().describe("Keywords, all must match (case-insensitive). Empty-ish terms match all."),
       limit: z.number().int().min(1).max(100).default(20).describe("Max results"),
@@ -137,9 +142,10 @@ server.registerTool(
   async ({ query, limit, mode }) => {
     const themes = await fetchJson("themes");
     const terms = toTerms(query);
-    const out = themes
+    const matchedThemes = themes
       .filter((t) => matches(`${t.name} ${t.author}`, terms))
-      .filter((t) => mode === "any" || (t.modes || []).includes(mode))
+      .filter((t) => mode === "any" || (t.modes || []).includes(mode));
+    const out = matchedThemes
       .map((t) => ({
         name: t.name,
         author: t.author,
@@ -150,7 +156,12 @@ server.registerTool(
       }))
       .slice(0, limit);
     return {
-      content: [{ type: "text", text: JSON.stringify({ total_matches_shown: out.length, results: out }, null, 2) }],
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({ total_matches: matchedThemes.length, shown: out.length, results: out }, null, 2),
+        },
+      ],
     };
   }
 );
@@ -160,7 +171,7 @@ server.registerTool(
   {
     title: "Get Obsidian plugin details",
     description:
-      "Look up one plugin by exact id (as used in the directory) and return its full directory entry plus download/version stats.",
+      "Look up one plugin by exact id (as used in the directory) and return its entry plus downloads, latest version, last-update date and number of releases. Use this to judge whether an existing plugin is alive (recent updates, many releases) or abandoned, before deciding to build, fork, or contribute.",
     inputSchema: { id: z.string().describe("Plugin id, e.g. 'dataview'") },
   },
   async ({ id }) => {
@@ -186,7 +197,8 @@ server.registerTool(
   "top_plugins",
   {
     title: "Top Obsidian plugins by downloads",
-    description: "List the most-downloaded community plugins, optionally filtered by keyword.",
+    description:
+      "List the most-downloaded community plugins, optionally filtered by keyword. Use this to see which plugins dominate a category before entering it.",
     inputSchema: {
       query: z.string().default("").describe("Optional keyword filter"),
       limit: z.number().int().min(1).max(100).default(25),

@@ -56,6 +56,7 @@ try {
   ]);
   check("parallel cold calls succeed", true, `${Date.now() - t0} ms`);
   check("search_plugins finds Kanban", plugins.results.some((p) => p.id === "obsidian-kanban"));
+  check("search_plugins reports total beyond limit", plugins.total_matches >= plugins.shown && plugins.shown === plugins.results.length, `${plugins.total_matches} total, ${plugins.shown} shown`);
   check("search_plugins sorted by downloads", plugins.results.every((p, i, a) => i === 0 || a[i - 1].downloads >= p.downloads));
   check("search_plugins reports latest version", plugins.results.every((p) => typeof p.latest === "string"), plugins.results[0]?.latest);
   check("search_themes respects mode filter", themes.results.every((t) => t.modes.includes("dark")));
@@ -67,8 +68,9 @@ try {
   check("top_plugins returns 5 sorted results", top.length === 5 && top[0].downloads >= top[4].downloads, top[0].name);
 
   const t1 = Date.now();
-  await call("search_plugins", { query: "calendar", limit: 1 });
+  const pomo = await call("search_plugins", { query: "pomodoro", limit: 3 });
   check("warm call is fast", Date.now() - t1 < 1000, `${Date.now() - t1} ms`);
+  check("total_matches counts all, not just shown", pomo.total_matches > 3 && pomo.shown === 3, `${pomo.total_matches} pomodoro plugins`);
 
   const missing = await rpc("tools/call", { name: "get_plugin", arguments: { id: "no-such-plugin-xyz" } });
   check("unknown plugin returns isError", missing.isError === true);
