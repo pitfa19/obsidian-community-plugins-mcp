@@ -83,6 +83,23 @@ Restart the client. Ask *"is there already an Obsidian plugin for pomodoro timer
 
 **To remove it**, delete the skill folder or the MCP config entry (`claude mcp remove obsidian-plugins`). The only other trace is a 4 MB cache in `~/.cache/obsidian-community-plugins`, created by the command line.
 
+### From a local copy
+
+To run it from files on your machine instead of from GitHub (offline use, a fork, or your own changes), clone it and point every install at that folder:
+
+```bash
+git clone https://github.com/pitfa19/obsidian-community-plugins-mcp.git ~/obsidian-community-plugins-mcp
+cd ~/obsidian-community-plugins-mcp && npm install
+```
+
+| Way | Use |
+| --- | --- |
+| Command | `node ~/obsidian-community-plugins-mcp/server.mjs search pomodoro` |
+| Skill | `cp -r ~/obsidian-community-plugins-mcp/skills/obsidian-plugin-check ~/.claude/skills/`, then change the skill's `npx -y github:...` lines to `node ~/obsidian-community-plugins-mcp/server.mjs` |
+| MCP server | `"command": "node", "args": ["/full/path/to/obsidian-community-plugins-mcp/server.mjs"]` in your MCP config. Use the full path; `~` is not expanded there. |
+
+To pass a single file around, build a package with `npm pack` and install it anywhere with `npm install ./obsidian-community-plugins-mcp-1.3.0.tgz`.
+
 ## Example
 
 > **You:** Build me an Obsidian plugin with a pomodoro timer.
