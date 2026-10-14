@@ -6,6 +6,10 @@
 
 Your assistant searches all 8,900+ community plugins and 870+ themes, live, with download counts and versions.
 
+[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-000000?style=for-the-badge)](https://cursor.com/en/install-mcp?name=obsidian-plugins&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImdpdGh1YjpwaXRmYTE5L29ic2lkaWFuLWNvbW11bml0eS1wbHVnaW5zLW1jcCJdfQ==)
+[![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-007ACC?style=for-the-badge)](https://vscode.dev/redirect/mcp/install?name=obsidian-plugins&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Apitfa19%2Fobsidian-community-plugins-mcp%22%5D%7D)
+
+[![CI](https://github.com/pitfa19/obsidian-community-plugins-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/pitfa19/obsidian-community-plugins-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Node 18+](https://img.shields.io/badge/node-18%2B-339933?style=flat-square)](#install)
 [![MCP](https://img.shields.io/badge/MCP-stdio-7c3aed?style=flat-square)](https://modelcontextprotocol.io)
@@ -34,13 +38,15 @@ It is for anyone who uses Obsidian with Claude Desktop, Claude Code, Cursor or a
 
 You need Node 18 or newer.
 
+**Cursor or VS Code:** click the install button at the top of this page.
+
 **Claude Code**
 
 ```bash
 claude mcp add obsidian-plugins -- npx -y github:pitfa19/obsidian-community-plugins-mcp
 ```
 
-**Claude Desktop, Cursor, Windsurf and other clients.** Add this to your MCP config:
+**Claude Desktop, Windsurf and other clients.** Add this to your MCP config:
 
 ```json
 {
