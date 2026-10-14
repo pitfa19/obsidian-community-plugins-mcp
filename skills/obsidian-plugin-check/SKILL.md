@@ -37,6 +37,10 @@ Freshness, from today's date: updated within 12 months is **active**, older is *
 
 A large plugin that only includes the feature (a task manager with a built-in timer) is not a dedicated competitor. Mention it, but judge the space on dedicated plugins.
 
+If both apply, **crowded wins**: one active dedicated plugin over 50,000 downloads outweighs any number of stale ones.
+
+To confirm a plugin has a specific feature, read its README from the repo link in the results. The directory only holds a one-line description, and memory is not a source.
+
 Run `info <id>` on every plugin you name in your answer, to confirm its update date and release count.
 
 Done when: every relevant result is placed in a bucket and every plugin you name has been checked with `info`.
