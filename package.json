@@ -1,0 +1,42 @@
+{
+  "name": "obsidian-community-plugins-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for searching the official Obsidian community plugin and theme directory (8,900+ plugins, 870+ themes) with download stats.",
+  "type": "module",
+  "bin": {
+    "obsidian-community-plugins-mcp": "./server.mjs"
+  },
+  "main": "server.mjs",
+  "files": [
+    "server.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "obsidian",
+    "obsidian-plugins",
+    "obsidian-themes",
+    "ai",
+    "claude",
+    "llm"
+  ],
+  "author": "pitfa19",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pitfa19/obsidian-community-plugins-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pitfa19/obsidian-community-plugins-mcp/issues"
+  },
+  "homepage": "https://github.com/pitfa19/obsidian-community-plugins-mcp#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^3.25.76"
+  }
+}
