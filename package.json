@@ -1,12 +1,16 @@
 {
   "name": "obsidian-community-plugins-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server for searching the official Obsidian community plugin and theme directory (8,900+ plugins, 870+ themes) with download stats.",
   "type": "module",
   "bin": {
     "obsidian-community-plugins-mcp": "./server.mjs"
   },
   "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node test.mjs"
+  },
   "files": [
     "server.mjs",
     "README.md",

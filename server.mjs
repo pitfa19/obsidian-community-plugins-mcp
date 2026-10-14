@@ -15,16 +15,66 @@ const URLS = {
 };
 
 const cache = new Map(); // key -> { at, data }
+const inflight = new Map(); // key -> Promise, so parallel calls share one download
 const TTL_MS = 10 * 60 * 1000;
+const FETCH_TIMEOUT_MS = 8000;
+const ATTEMPTS = 3;
+
+async function download(key) {
+  let lastErr;
+  for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch(URLS[key], { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw new Error(`Could not download ${key} after ${ATTEMPTS} attempts: ${lastErr?.message ?? lastErr}`);
+}
 
 async function fetchJson(key) {
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < TTL_MS) return hit.data;
-  const res = await fetch(URLS[key]);
-  if (!res.ok) throw new Error(`Fetch ${key} failed: HTTP ${res.status}`);
-  const data = await res.json();
-  cache.set(key, { at: Date.now(), data });
-  return data;
+  if (!inflight.has(key)) {
+    inflight.set(
+      key,
+      download(key)
+        .then((data) => {
+          cache.set(key, { at: Date.now(), data });
+          return data;
+        })
+        .catch((err) => {
+          if (hit) return hit.data; // serve stale data rather than fail
+          throw err;
+        })
+        .finally(() => inflight.delete(key))
+    );
+  }
+  return inflight.get(key);
+}
+
+// Plugin stats have one key per released version ("1.2.3": downloads).
+// The newest version is the highest semver-looking key.
+function latestVersion(stat) {
+  if (!stat) return null;
+  const versions = Object.keys(stat).filter((k) => /^\d+(\.\d+)*$/.test(k));
+  if (versions.length === 0) return null;
+  const cmp = (a, b) => {
+    const pa = a.split(".").map(Number);
+    const pb = b.split(".").map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const d = (pa[i] ?? 0) - (pb[i] ?? 0);
+      if (d !== 0) return d;
+    }
+    return 0;
+  };
+  return versions.sort(cmp).at(-1);
+}
+
+function isoDate(ms) {
+  return ms ? new Date(ms).toISOString().slice(0, 10) : null;
 }
 
 function matches(text, terms) {
@@ -36,7 +86,7 @@ function toTerms(query) {
   return query.toLowerCase().split(/\s+/).filter(Boolean);
 }
 
-const server = new McpServer({ name: "obsidian-community-plugins", version: "1.0.0" });
+const server = new McpServer({ name: "obsidian-community-plugins", version: "1.1.0" });
 
 server.registerTool(
   "search_plugins",
@@ -61,8 +111,8 @@ server.registerTool(
         description: p.description,
         repo: `https://github.com/${p.repo}`,
         downloads: stats[p.id]?.downloads ?? 0,
-        latest: stats[p.id]?.latest ?? null,
-        updated: stats[p.id]?.updated ? new Date(stats[p.id].updated).toISOString().slice(0, 10) : null,
+        latest: latestVersion(stats[p.id]),
+        updated: isoDate(stats[p.id]?.updated),
       }))
       .sort((a, b) => b.downloads - a.downloads)
       .slice(0, limit);
@@ -120,7 +170,14 @@ server.registerTool(
       return { content: [{ type: "text", text: `No plugin with id '${id}' in the community directory.` }], isError: true };
     }
     const s = stats[id] || {};
-    const detail = { ...p, repo_url: `https://github.com/${p.repo}`, stats: s };
+    const detail = {
+      ...p,
+      repo_url: `https://github.com/${p.repo}`,
+      downloads: s.downloads ?? 0,
+      latest: latestVersion(s),
+      updated: isoDate(s.updated),
+      versions_released: Object.keys(s).filter((k) => /^\d+(\.\d+)*$/.test(k)).length,
+    };
     return { content: [{ type: "text", text: JSON.stringify(detail, null, 2) }] };
   }
 );
@@ -149,3 +206,7 @@ server.registerTool(
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
+
+// Warm the cache in the background so the first tool call is usually instant.
+// Failures are ignored here; tool calls retry on demand.
+for (const key of Object.keys(URLS)) fetchJson(key).catch(() => {});

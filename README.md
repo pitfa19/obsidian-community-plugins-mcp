@@ -1,108 +1,109 @@
+<div align="center">
+
 # obsidian-community-plugins-mcp
 
-**Let your AI assistant search all 8,900+ Obsidian community plugins and 870+ themes.**
+**Ask your AI which Obsidian plugin to use. Get a real answer.**
 
-An [MCP](https://modelcontextprotocol.io) server over the official Obsidian community directory — the same data that powers the in-app plugin browser. Ask your assistant things like:
+Your assistant searches all 8,900+ community plugins and 870+ themes, live, with download counts and versions.
 
-> *"Find me an Obsidian plugin for spaced repetition with the most downloads"*
-> *"Is there a plugin that syncs tasks with my calendar?"*
-> *"Show me dark themes that also support light mode"*
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![Node 18+](https://img.shields.io/badge/node-18%2B-339933?style=flat-square)](#install)
+[![MCP](https://img.shields.io/badge/MCP-stdio-7c3aed?style=flat-square)](https://modelcontextprotocol.io)
+[![Read-only](https://img.shields.io/badge/access-read--only-success?style=flat-square)](#safety)
 
-and it answers from live directory data instead of hallucinating plugin names.
+[What it is](#what-it-is) · [Install](#install) · [Example](#example) · [Tools](#tools) · [Safety](#safety)
 
-## Why
+</div>
 
-There was no MCP server for the Obsidian **directory** — every existing Obsidian MCP searches *your vault*. But when you ask an LLM "what plugin does X?", it guesses from stale training data: plugin names get invented, dead plugins get recommended, new ones are invisible.
+---
 
-This server fixes that with four small tools over the canonical source of truth, [`obsidianmd/obsidian-releases`](https://github.com/obsidianmd/obsidian-releases):
+## What it is
 
-- `community-plugins.json` — every listed plugin
-- `community-css-themes.json` — every listed theme
-- `community-plugin-stats.json` — download counts and last-update dates
+Ask Claude or ChatGPT "what's the best Obsidian plugin for X?" and it answers from memory. It names plugins that do not exist, recommends ones abandoned years ago, and has never heard of anything new.
 
-No API key. No scraping. No local index to build. One file, two dependencies.
+**This MCP server gives your assistant the real directory.** It reads the same list that Obsidian's own plugin browser uses, so answers are current.
 
-## Tools
+- **Every plugin and theme.** 8,900+ plugins and 870+ themes from the official [`obsidianmd/obsidian-releases`](https://github.com/obsidianmd/obsidian-releases) index.
+- **Signals, not just names.** Each result has downloads, latest version and last-update date, so your assistant can tell a popular, maintained plugin from a dead one.
+- **Nothing to set up.** No API key, no account, no local database. One file, two dependencies.
+- **Only reads.** It never touches your vault or installs anything.
 
-| Tool | What it does |
-|---|---|
-| `search_plugins` | Keyword search over name, id, author, description. Sorted by downloads. |
-| `search_themes` | Keyword search over themes, with dark/light mode filter and screenshot URLs. |
-| `get_plugin` | Full directory entry + stats for one plugin by id. |
-| `top_plugins` | Most-downloaded plugins, optionally filtered by keyword. |
-
-Results include download counts, last-update dates, and GitHub repo links, so the assistant can judge whether a plugin is popular and maintained, not just whether it exists.
+It is for anyone who uses Obsidian with Claude Desktop, Claude Code, Cursor or any other MCP client.
 
 ## Install
 
-Requires Node 18+.
+You need Node 18 or newer.
+
+**Claude Code**
 
 ```bash
-npx obsidian-community-plugins-mcp
+claude mcp add obsidian-plugins -- npx -y github:pitfa19/obsidian-community-plugins-mcp
 ```
 
-Or from source:
-
-```bash
-git clone https://github.com/pitfa19/obsidian-community-plugins-mcp
-cd obsidian-community-plugins-mcp
-npm install
-node server.mjs
-```
-
-### Claude Desktop / Claude Code
+**Claude Desktop, Cursor, Windsurf and other clients.** Add this to your MCP config:
 
 ```json
 {
   "mcpServers": {
-    "obsidian-community-plugins": {
+    "obsidian-plugins": {
       "command": "npx",
-      "args": ["-y", "obsidian-community-plugins-mcp"]
+      "args": ["-y", "github:pitfa19/obsidian-community-plugins-mcp"]
     }
   }
 }
 ```
 
-Claude Code one-liner:
+Restart the client. Ask *"find me an Obsidian plugin for spaced repetition"* to check it works.
 
-```bash
-claude mcp add obsidian-community-plugins -- npx -y obsidian-community-plugins-mcp
-```
-
-### Cursor / Windsurf / other MCP clients
-
-Any client that speaks stdio MCP works — point it at `npx -y obsidian-community-plugins-mcp`.
+**To remove it**, delete that config entry, or run `claude mcp remove obsidian-plugins`. Nothing else is left on your machine except the npx cache.
 
 ## Example
 
-```
-> search_plugins query="kanban" limit=3
+> **You:** I want flashcards in Obsidian. What should I install?
 
-{
-  "results": [
-    {
-      "id": "obsidian-kanban",
-      "name": "Kanban",
-      "description": "Create Markdown-backed Kanban boards.",
-      "repo": "https://github.com/obsidian-community/obsidian-kanban",
-      "downloads": 2748406,
-      "updated": "2024-05-31"
-    },
-    ...
-  ]
-}
-```
+The assistant calls `search_plugins` with `"spaced repetition"` and gets live data:
+
+| Plugin | Downloads | Latest | Updated |
+| --- | ---: | --- | --- |
+| Spaced Repetition | 614,850 | 1.15.4 | 2026-06-14 |
+| LearnKit | 26,531 | 1.8.2 | 2026-09-14 |
+| Aosr | 16,251 | 1.2.2 | 2026-10-05 |
+
+So it can answer: *Spaced Repetition is the established choice. LearnKit is newer and actively updated if you want tests as well as flashcards.* Every name is real.
+
+## Tools
+
+| You want | Tool |
+| --- | --- |
+| Find plugins for a task | `search_plugins`: keyword search, most downloaded first |
+| Find a theme | `search_themes`: filter by dark or light mode, with screenshot links |
+| Check one plugin before installing | `get_plugin`: downloads, latest version, last update, release count |
+| See what is popular | `top_plugins`: most downloaded, optionally filtered by keyword |
+
+Every result links to the plugin's GitHub repo, so your assistant can read its README when you want details.
+
+## Safety
+
+- **Read-only.** All four tools only read public data. Nothing is written, installed or changed.
+- **One network destination.** It fetches three public JSON files from `raw.githubusercontent.com`. No other network calls, no telemetry.
+- **No credentials.** It needs no API key or token and reads no environment variables.
+- **No file access.** It does not read your vault or any file on disk.
+- **Honest limits.** Search is plain keyword matching, not semantic. Data is cached for 10 minutes, so a plugin listed a minute ago may take that long to appear. Download counts come from Obsidian's public stats file and are not independently verified.
 
 ## How it works
 
-Fetches the three JSON indexes straight from GitHub raw content, caches them in memory for 10 minutes, and does case-insensitive all-terms matching. That's the whole trick — the directory is small enough (~3 MB) that nothing fancier is needed.
+On start it downloads the three index files (about 5 MB) and keeps them in memory for 10 minutes. Searches run locally against that copy, so they are instant once loaded. Downloads time out and retry, and if GitHub is unreachable it keeps serving the last good copy.
 
-## Non-goals
+## Development
 
-- Searching *inside* your vault (plenty of MCPs do that already)
-- Installing plugins (Obsidian's own UI is the right place)
-- Mirroring plugin READMEs (results link to each repo; your assistant can fetch them)
+```bash
+git clone https://github.com/pitfa19/obsidian-community-plugins-mcp.git && cd obsidian-community-plugins-mcp
+npm install
+npm test
+```
+
+`npm test` starts the server and calls every tool against the live directory.
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
