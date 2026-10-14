@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 // Smoke test: starts the server over stdio and calls every tool against live data.
 // Usage: npm test
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const server = spawn(process.execPath, [fileURLToPath(new URL("./server.mjs", import.meta.url))], {
+const serverPath = fileURLToPath(new URL("./server.mjs", import.meta.url));
+const server = spawn(process.execPath, [serverPath], {
   stdio: ["pipe", "pipe", "inherit"],
 });
+let serverVersion = "";
 
 const pending = new Map();
 let buf = "";
@@ -43,7 +45,8 @@ function check(label, ok, detail = "") {
 }
 
 try {
-  await rpc("initialize", { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "test", version: "0" } });
+  const init = await rpc("initialize", { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "test", version: "0" } });
+  serverVersion = init.serverInfo.version;
   server.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\n");
 
   const tools = (await rpc("tools/list", {})).tools.map((t) => t.name).sort();
@@ -74,6 +77,23 @@ try {
 
   const missing = await rpc("tools/call", { name: "get_plugin", arguments: { id: "no-such-plugin-xyz" } });
   check("unknown plugin returns isError", missing.isError === true);
+
+  // CLI: same data as the MCP server, plus exit codes agents can rely on.
+  const cli = (...a) => spawnSync(process.execPath, [serverPath, ...a], { encoding: "utf8", timeout: 60000 });
+  const cliSearch = cli("search", "pomodoro", "--limit", "3", "--json");
+  const cliJson = cliSearch.status === 0 ? JSON.parse(cliSearch.stdout) : null;
+  check("CLI search exits 0 with JSON", cliJson !== null, `exit ${cliSearch.status}`);
+  check(
+    "CLI and MCP return identical search results",
+    JSON.stringify(cliJson) === JSON.stringify(pomo),
+    `${cliJson?.total_matches} vs ${pomo.total_matches}`
+  );
+  const cliText = cli("search", "pomodoro", "--limit", "2");
+  check("CLI text output leads with the match count", /^\d+ plugins match "pomodoro"/.test(cliText.stdout), cliText.stdout.split("\n")[0]);
+  check("CLI info on unknown id exits 1", cli("info", "no-such-plugin-xyz").status === 1);
+  check("CLI bad --limit exits 2", cli("search", "x", "--limit", "0").status === 2);
+  check("CLI unknown command exits 2", cli("bogus").status === 2);
+  check("CLI --version matches server", cli("--version").stdout.trim() === serverVersion, serverVersion);
 } catch (err) {
   check("test run", false, err.message);
 } finally {

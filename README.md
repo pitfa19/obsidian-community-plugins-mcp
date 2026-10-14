@@ -15,7 +15,7 @@ Building an Obsidian plugin or tool? Find out what already exists, who maintains
 [![MCP](https://img.shields.io/badge/MCP-stdio-7c3aed?style=flat-square)](https://modelcontextprotocol.io)
 [![Read-only](https://img.shields.io/badge/access-read--only-success?style=flat-square)](#safety)
 
-[What it is](#what-it-is) · [Install](#install) · [Example](#example) · [For agents](#for-coding-agents) · [Tools](#tools) · [Safety](#safety)
+[What it is](#what-it-is) · [Install](#install) · [Example](#example) · [Command line](#command-line) · [Tools](#mcp-tools) · [Safety](#safety)
 
 </div>
 
@@ -25,22 +25,42 @@ Building an Obsidian plugin or tool? Find out what already exists, who maintains
 
 The Obsidian community has 8,900+ plugins, and many ideas are already taken. There are 27 plugins that mention pomodoro alone. Coding agents do not know this. Ask one to build a plugin and it starts writing, without checking whether a better one already exists. Ask it what is out there and it answers from memory: plugins that do not exist, plugins abandoned years ago, nothing recent.
 
-**This MCP server gives your agent the real directory.** It reads the same list that Obsidian's own plugin browser uses, so the agent can check what exists before it builds.
+**This gives your agent the real directory**, the same list Obsidian's own plugin browser uses, so it can check what exists before it builds. Use it as a **skill**, a **command**, or an **MCP server**.
 
 - **Every plugin and theme.** 8,900+ plugins and 870+ themes from the official [`obsidianmd/obsidian-releases`](https://github.com/obsidianmd/obsidian-releases) index.
 - **See what is alive.** Each result has downloads, latest version and last-update date. A popular plugin last updated in 2021 is a gap you could fill. A maintained one with a million downloads is a reason to contribute instead.
-- **Nothing to set up.** No API key, no account, no local database. One file, two dependencies.
+- **Nothing to set up.** No API key, no account, no local database. Two dependencies.
 - **Only reads.** It never touches your vault or installs anything.
 
-It is for anyone building Obsidian plugins, themes or tools, and for the coding agents that help them: Claude Code, Cursor, Codex and any other MCP client. It works just as well when you only want to pick the right plugin to install.
+It is for anyone building Obsidian plugins, themes or tools, and for the coding agents that help them: Claude Code, Codex, Cursor and others. It works just as well when you only want to pick the right plugin to install.
 
 ## Install
 
-You need Node 18 or newer.
+You need Node 18 or newer. Pick one way:
+
+| You use | Best fit | Why |
+| --- | --- | --- |
+| A coding agent with a terminal (Claude Code, Codex, jcode) | **Skill** | Costs your agent's context almost nothing until it is needed |
+| A chat app without a terminal (Claude Desktop, Cursor chat) | **MCP server** | The app calls the tools directly |
+| Your own shell or scripts | **Command** | Plain text or JSON output |
+
+### Skill
+
+Copy the skill into your agent's skills folder. For Claude Code:
+
+```bash
+mkdir -p ~/.claude/skills/obsidian-plugin-check
+curl -sL https://raw.githubusercontent.com/pitfa19/obsidian-community-plugins-mcp/main/skills/obsidian-plugin-check/SKILL.md \
+  -o ~/.claude/skills/obsidian-plugin-check/SKILL.md
+```
+
+Other agents: put [`SKILL.md`](skills/obsidian-plugin-check/SKILL.md) wherever they load skills, or paste it into `AGENTS.md`. The agent then searches the directory by itself whenever you ask it to build an Obsidian plugin. If Node is missing, the skill falls back to `curl` and `jq`.
+
+### MCP server
 
 **Cursor or VS Code:** click the install button at the top of this page.
 
-**Claude Code**
+**Claude Code:**
 
 ```bash
 claude mcp add obsidian-plugins -- npx -y github:pitfa19/obsidian-community-plugins-mcp
@@ -61,13 +81,13 @@ claude mcp add obsidian-plugins -- npx -y github:pitfa19/obsidian-community-plug
 
 Restart the client. Ask *"is there already an Obsidian plugin for pomodoro timers?"* to check it works.
 
-**To remove it**, delete that config entry, or run `claude mcp remove obsidian-plugins`. Nothing else is left on your machine except the npx cache.
+**To remove it**, delete the skill folder or the MCP config entry (`claude mcp remove obsidian-plugins`). The only other trace is a 4 MB cache in `~/.cache/obsidian-community-plugins`, created by the command line.
 
 ## Example
 
 > **You:** Build me an Obsidian plugin with a pomodoro timer.
 
-Before writing code, the agent calls `search_plugins` with `"pomodoro"`. It finds 27 matches. The top ones:
+Before writing code, the agent runs `search pomodoro`. It finds 27 matches. The top ones:
 
 | Plugin | Downloads | Latest | Updated |
 | --- | ---: | --- | --- |
@@ -80,22 +100,33 @@ So instead of building the 28th timer, it can tell you: *a plain timer is well c
 
 It works the same way when you only want to pick a plugin to install. Ask *"what should I use for flashcards?"* and you get Spaced Repetition (614,850 downloads) and newer alternatives, not guesses.
 
-## For coding agents
+## Command line
 
-Add this to your project's `AGENTS.md` or `CLAUDE.md` so your agent checks the directory on its own:
+The same search, as a command. This is what the skill runs.
 
-```markdown
-## Obsidian plugin work
-
-Before building any Obsidian plugin, theme or feature, search the community
-directory with the obsidian-plugins MCP tools (`search_plugins`,
-`search_themes`, `get_plugin`). Report what already exists, with downloads
-and last-update dates, and say whether to build, fork, or contribute instead.
+```bash
+npx -y github:pitfa19/obsidian-community-plugins-mcp search pomodoro
 ```
 
-The tool descriptions are written so agents can decide on their own when to call them.
+```text
+27 plugins match "pomodoro" (top 10 by downloads)
 
-## Tools
+TaskNotes (tasknotes) | 2,113,918 downloads | v4.13.8 | updated 2026-10-02
+    Note-based task management with calendar, pomodoro and time-tracking integration.
+    https://github.com/callumalpass/tasknotes
+...
+```
+
+| Command | What it does |
+| --- | --- |
+| `search <keywords>` | Plugins matching all keywords, most downloaded first |
+| `info <plugin-id>` | One plugin: downloads, latest version, last update, releases |
+| `top [keywords]` | Most downloaded plugins, optionally filtered |
+| `themes [keywords]` | Themes, with `--mode dark` or `--mode light` |
+
+Add `--limit N` for more results and `--json` for machine-readable output. Exit code 1 means "not found", 2 a usage error, 3 a network failure. Run with no command and it starts the MCP server instead.
+
+## MCP tools
 
 | You want | Tool |
 | --- | --- |
@@ -104,19 +135,19 @@ The tool descriptions are written so agents can decide on their own when to call
 | Judge one plugin: alive or abandoned? | `get_plugin`: downloads, latest version, last update, release count |
 | See what is popular in a category | `top_plugins`: most downloaded, optionally filtered by keyword |
 
-Every result links to the plugin's GitHub repo, so your agent can read its README and source when it needs details.
+The tool descriptions tell the agent to search before it builds, so it calls them on its own. Every result links to the plugin's GitHub repo, so your agent can read its README and source when it needs details.
 
 ## Safety
 
-- **Read-only.** All four tools only read public data. Nothing is written, installed or changed.
+- **Read-only toward the world.** Every tool and command only reads public data. Nothing is installed, and your vault is never touched.
 - **One network destination.** It fetches three public JSON files from `raw.githubusercontent.com`. No other network calls, no telemetry.
-- **No credentials.** It needs no API key or token and reads no environment variables.
-- **No file access.** It does not read your vault or any file on disk.
+- **No credentials.** It needs no API key or token.
+- **One local file write.** The command line caches the index in `~/.cache/obsidian-community-plugins` (or `$XDG_CACHE_HOME`). The MCP server keeps it in memory only.
 - **Honest limits.** Search is plain keyword matching, not semantic. Data is cached for 10 minutes, so a plugin listed a minute ago may take that long to appear. Download counts come from Obsidian's public stats file and are not independently verified.
 
 ## How it works
 
-On start it downloads the three index files (about 5 MB) and keeps them in memory for 10 minutes. Searches run locally against that copy, so they are instant once loaded. Downloads time out and retry, and if GitHub is unreachable it keeps serving the last good copy.
+It downloads the three index files (about 5 MB) and keeps them for 10 minutes: in memory for the MCP server, on disk for the command line, so repeat commands take about 0.1 seconds. Searches run locally against that copy. Downloads time out and retry, and if GitHub is unreachable it keeps serving the last good copy.
 
 ## Development
 
@@ -126,7 +157,7 @@ npm install
 npm test
 ```
 
-`npm test` starts the server and calls every tool against the live directory.
+`npm test` starts the MCP server and the command line, checks every tool against the live directory, and checks that both return identical results.
 
 ## License
 
