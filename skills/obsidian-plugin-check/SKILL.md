@@ -23,23 +23,23 @@ The first line of output is always the match count, like `27 plugins match "pomo
 | Who dominates a category | `top <keywords>` |
 | Themes | `themes <keywords> [--mode dark\|light]` |
 
-Add `--limit N` for more results, `--json` for exact data. Search runs on name, id, author and description, and every keyword must match. Try two or three phrasings (`pomodoro`, `focus timer`), and narrow with a detail from the idea (`pomodoro sidebar`).
+Add `--limit N` for more results, `--json` for exact data. Keywords need no quotes, and every keyword must match name, id, author or description. Try two or three phrasings (`pomodoro`, `focus timer`), and narrow with a detail from the idea (`pomodoro sidebar`).
 
 Done when: you have the total match count and the top results for every phrasing you tried.
 
 ## 2. Judge
 
-Today's date decides freshness: updated within 6 months is **active**, over 12 months is **stale**.
+Freshness, from today's date: updated within 12 months is **active**, older is **stale**.
 
-- **Crowded:** a match with over 50,000 downloads that is active. Recommend using it or contributing to it.
-- **Gap:** the best-known matches are stale, or nothing matches. Building is justified.
+- **Crowded:** a dedicated plugin with over 50,000 downloads that is active. Recommend using it or contributing to it.
+- **Gap:** the best-known dedicated plugins are stale, or nothing matches. Building is justified.
 - **Niche:** only matches under 5,000 downloads. Building is justified if the user's idea differs; say how.
 
-A space can be crowded and stale at once (high downloads, no recent updates). Call that a gap and name the stale leader.
+A large plugin that only includes the feature (a task manager with a built-in timer) is not a dedicated competitor. Mention it, but judge the space on dedicated plugins.
 
-Run `info <id>` on every plugin you recommend, to confirm its update date and release count.
+Run `info <id>` on every plugin you name in your answer, to confirm its update date and release count.
 
-Done when: every relevant result is placed in a bucket and every recommended plugin has been checked with `info`.
+Done when: every relevant result is placed in a bucket and every plugin you name has been checked with `info`.
 
 ## 3. Report
 
