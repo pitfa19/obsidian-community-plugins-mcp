@@ -12,7 +12,7 @@ The Obsidian community directory is the source of truth for what already exists.
 Run, with one or two keywords for the core idea:
 
 ```bash
-npx -y github:pitfa19/obsidian-community-plugins-mcp search pomodoro
+npx -y obsidian-community-plugins-mcp search pomodoro
 ```
 
 The first line of output is always the match count, like `27 plugins match "pomodoro"`. If the output is empty or lacks that line, the tool did not run: use the fallback at the end of this file.

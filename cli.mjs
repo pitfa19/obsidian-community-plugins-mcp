@@ -9,7 +9,7 @@ const HELP = `obsidian-community-plugins ${VERSION}
 Search the official Obsidian plugin and theme directory (8,900+ plugins).
 
 Usage:
-  npx -y github:pitfa19/obsidian-community-plugins-mcp <command> [options]
+  npx -y obsidian-community-plugins-mcp <command> [options]
 
 Commands:
   search <keywords>    Plugins matching all keywords, most downloaded first

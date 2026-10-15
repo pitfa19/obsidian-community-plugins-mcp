@@ -6,8 +6,8 @@
 
 Building an Obsidian plugin or tool? Find out what already exists, who maintains it, and where the gaps are, before you write a line of code.
 
-[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-000000?style=for-the-badge)](https://cursor.com/en/install-mcp?name=obsidian-plugins&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImdpdGh1YjpwaXRmYTE5L29ic2lkaWFuLWNvbW11bml0eS1wbHVnaW5zLW1jcCJdfQ==)
-[![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-007ACC?style=for-the-badge)](https://vscode.dev/redirect/mcp/install?name=obsidian-plugins&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Apitfa19%2Fobsidian-community-plugins-mcp%22%5D%7D)
+[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-000000?style=for-the-badge)](https://cursor.com/en/install-mcp?name=obsidian-plugins&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIm9ic2lkaWFuLWNvbW11bml0eS1wbHVnaW5zLW1jcCJdfQ==)
+[![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-007ACC?style=for-the-badge)](https://vscode.dev/redirect/mcp/install?name=obsidian-plugins&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22obsidian-community-plugins-mcp%22%5D%7D)
 
 [![CI](https://github.com/pitfa19/obsidian-community-plugins-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/pitfa19/obsidian-community-plugins-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
@@ -63,7 +63,7 @@ Other agents: put [`SKILL.md`](skills/obsidian-plugin-check/SKILL.md) wherever t
 **Claude Code:**
 
 ```bash
-claude mcp add obsidian-plugins -- npx -y github:pitfa19/obsidian-community-plugins-mcp
+claude mcp add obsidian-plugins -- npx -y obsidian-community-plugins-mcp
 ```
 
 **Claude Desktop, Windsurf and other clients.** Add this to your MCP config:
@@ -73,7 +73,7 @@ claude mcp add obsidian-plugins -- npx -y github:pitfa19/obsidian-community-plug
   "mcpServers": {
     "obsidian-plugins": {
       "command": "npx",
-      "args": ["-y", "github:pitfa19/obsidian-community-plugins-mcp"]
+      "args": ["-y", "obsidian-community-plugins-mcp"]
     }
   }
 }
@@ -95,7 +95,7 @@ cd ~/obsidian-community-plugins-mcp && npm install
 | Way | Use |
 | --- | --- |
 | Command | `node ~/obsidian-community-plugins-mcp/server.mjs search pomodoro` |
-| Skill | `cp -r ~/obsidian-community-plugins-mcp/skills/obsidian-plugin-check ~/.claude/skills/`, then change the skill's `npx -y github:...` lines to `node ~/obsidian-community-plugins-mcp/server.mjs` |
+| Skill | `cp -r ~/obsidian-community-plugins-mcp/skills/obsidian-plugin-check ~/.claude/skills/`, then change the skill's `npx -y obsidian-community-plugins-mcp` lines to `node ~/obsidian-community-plugins-mcp/server.mjs` |
 | MCP server | `"command": "node", "args": ["/full/path/to/obsidian-community-plugins-mcp/server.mjs"]` in your MCP config. Use the full path; `~` is not expanded there. |
 
 To pass a single file around, build a package with `npm pack` and install it anywhere with `npm install ./obsidian-community-plugins-mcp-1.3.0.tgz`.
@@ -122,7 +122,7 @@ It works the same way when you only want to pick a plugin to install. Ask *"what
 The same search, as a command. This is what the skill runs.
 
 ```bash
-npx -y github:pitfa19/obsidian-community-plugins-mcp search pomodoro
+npx -y obsidian-community-plugins-mcp search pomodoro
 ```
 
 ```text
@@ -175,6 +175,17 @@ npm test
 ```
 
 `npm test` starts the MCP server and the command line, checks every tool against the live directory, and checks that both return identical results.
+
+## Releasing
+
+Pushing a version tag publishes to npm through GitHub Actions (trusted publishing, no stored token):
+
+```bash
+npm version patch
+git push --follow-tags
+```
+
+The workflow checks that the tag matches `package.json`, runs the tests, then publishes with provenance.
 
 ## License
 
