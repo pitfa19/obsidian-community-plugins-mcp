@@ -2,7 +2,7 @@
 
 # obsidian-community-plugins-mcp
 
-**Check before you build. Search all 8,900+ Obsidian plugins from your coding agent.**
+**Check before you build. Search all 9,000+ Obsidian plugins from your coding agent.**
 
 Building an Obsidian plugin or tool? Find out what already exists, who maintains it, and where the gaps are, before you write a line of code.
 
@@ -23,11 +23,11 @@ Building an Obsidian plugin or tool? Find out what already exists, who maintains
 
 ## What it is
 
-The Obsidian community has 8,900+ plugins, and many ideas are already taken. There are 27 plugins that mention pomodoro alone. Coding agents do not know this. Ask one to build a plugin and it starts writing, without checking whether a better one already exists. Ask it what is out there and it answers from memory: plugins that do not exist, plugins abandoned years ago, nothing recent.
+The Obsidian community has 9,000+ plugins, and many ideas are already taken. There are 27 plugins that mention pomodoro alone. Coding agents do not know this. Ask one to build a plugin and it starts writing, without checking whether a better one already exists. Ask it what is out there and it answers from memory: plugins that do not exist, plugins abandoned years ago, nothing recent.
 
 **This gives your agent the real directory**, the same list Obsidian's own plugin browser uses, so it can check what exists before it builds. Use it as a **skill**, a **command**, or an **MCP server**.
 
-- **Every plugin and theme.** 8,900+ plugins and 870+ themes from the official [`obsidianmd/obsidian-releases`](https://github.com/obsidianmd/obsidian-releases) index.
+- **Every plugin and theme.** 9,000+ plugins and 880+ themes from the official [`obsidianmd/obsidian-releases`](https://github.com/obsidianmd/obsidian-releases) index.
 - **See what is alive.** Each result has downloads, latest version and last-update date. A popular plugin last updated in 2021 is a gap you could fill. A maintained one with a million downloads is a reason to contribute instead.
 - **Nothing to set up.** No API key, no account, no local database. Two dependencies.
 - **Only reads.** It never touches your vault or installs anything.
@@ -113,7 +113,7 @@ Before writing code, the agent runs `search pomodoro`. It finds 27 matches. The 
 | Pomodoro Timer | 60,566 | 1.2.3 | 2024-05-30 |
 | Pomodoro Plugin | 16,983 | 0.0.2 | 2021-05-20 |
 
-So instead of building the 28th timer, it can tell you: *a plain timer is well covered, and TaskNotes already ties pomodoros to tasks. Three of the four best-known timers have not shipped an update since early 2025, so a maintained, focused timer is a real opening. Or contribute to one that exists.* Every name and number is real.
+So instead of building the 28th timer, it can tell you: *this category is crowded and alive. TaskNotes already ties pomodoros to tasks, and dedicated timers such as Gentle Pomodoro (updated 2026-10-08), Minidoro and PomoBar are maintained. Only 4 of the 27 matches have gone a year without an update. Contribute to one that exists, or build something clearly different.* Every name and number is real, and "27 matches" counts plugins that mention the word, so a few only mention it in passing.
 
 It works the same way when you only want to pick a plugin to install. Ask *"what should I use for flashcards?"* and you get Spaced Repetition (614,850 downloads) and newer alternatives, not guesses.
 

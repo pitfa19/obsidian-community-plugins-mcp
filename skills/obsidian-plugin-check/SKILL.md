@@ -1,6 +1,6 @@
 ---
 name: obsidian-plugin-check
-description: Search the official Obsidian community plugin and theme directory (8,900+ plugins) before building. Use when asked to build, design or propose an Obsidian plugin, theme or feature, or to recommend which Obsidian plugin to use.
+description: Search the official Obsidian community plugin and theme directory (9,000+ plugins) before building. Use when asked to build, design or propose an Obsidian plugin, theme or feature, or to recommend which Obsidian plugin to use.
 ---
 
 # Check before you build

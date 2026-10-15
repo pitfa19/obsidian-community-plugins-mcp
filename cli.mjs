@@ -6,7 +6,7 @@ import { getPlugin, searchPlugins, searchThemes, topPlugins, useDiskCache } from
 import { VERSION } from "./version.mjs";
 
 const HELP = `obsidian-community-plugins ${VERSION}
-Search the official Obsidian plugin and theme directory (8,900+ plugins).
+Search the official Obsidian plugin and theme directory (9,000+ plugins).
 
 Usage:
   npx -y obsidian-community-plugins-mcp <command> [options]

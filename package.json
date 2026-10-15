@@ -1,7 +1,7 @@
 {
   "name": "obsidian-community-plugins-mcp",
   "version": "1.3.1",
-  "description": "MCP server that lets coding agents check the official Obsidian plugin and theme directory (8,900+ plugins) before building, with downloads, versions and last-update dates.",
+  "description": "MCP server that lets coding agents check the official Obsidian plugin and theme directory (9,000+ plugins) before building, with downloads, versions and last-update dates.",
   "type": "module",
   "bin": {
     "obsidian-community-plugins-mcp": "./server.mjs"
